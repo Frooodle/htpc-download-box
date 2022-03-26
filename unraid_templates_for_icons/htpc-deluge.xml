@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<?xml-model href="htpc_template_schema.xsd"?>
+
+
+<Container version="2">
+	<Name>htpc-deluge</Name>
+	<Repository>linuxserver/deluge</Repository>
+	<WebUI>http://[IP]:[PORT:8112]/</WebUI>
+	<Icon>https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/deluge-logo.png</Icon>
+</Container>

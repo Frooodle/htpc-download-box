@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<?xml-model href="htpc_template_schema.xsd"?>
+
+
+<Container version="2">
+	<Name>htpc-bazarr</Name>
+	<Repository>linuxserver/bazarr</Repository>
+	<WebUI>http://[IP]:[PORT:6767]/</WebUI>
+	<Icon>https://raw.githubusercontent.com/morpheus65535/bazarr/master/frontend/public/static/favicon.ico</Icon>
+</Container>

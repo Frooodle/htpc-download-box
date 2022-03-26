@@ -1,14 +1,14 @@
 version: "3.4"
 services:
   vpn:
-    container_name: vpn
+    container_name: htpc-vpn
     image: dperson/openvpn-client:latest
     cap_add:
       - net_admin # required to modify network interfaces
-    restart: unless-stopped
+    restart: ${RESTART_POLICY}
     volumes:
       - /dev/net:/dev/net:z # tun device
-      - /mnt/user/appdata/autoDownloaders/config/vpn:/vpn # OpenVPN configuration
+      - ${APPDATA_VPN}:/vpn # OpenVPN configuration
     security_opt:
       - label:disable
     ports:
@@ -16,115 +16,108 @@ services:
       - 9696:9696 # port for prowlarr web UI to be reachable from local network
       - 8989:8989 # port for sonarr web UI to be reachable from local network
       - 7878:7878 # port for radarr web UI to be reachable from local network
-      - 6767:6767 # port for bazarr web UI to be reachable from local network	  
-      - 8080:8080 # port for sabnzbd web UI to be reachable from local network	   
-    command: '-f "" -r 192.168.1.0/24' # enable firewall and route local network traffic
+      - 6767:6767 # port for bazarr web UI to be reachable from local network
+      - 8080:8080 # port for sabnzbd web UI to be reachable from local network
+    command: '-f "" -r ${HOST_NET}' # enable firewall and route local network traffic
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/ich777/docker-templates/master/ich777/images/openvpn-client.png"
- 
+
   deluge:
-    container_name: deluge
+    container_name: htpc-deluge
     image: linuxserver/deluge:latest
-    restart: unless-stopped
+    restart: ${RESTART_POLICY}
     network_mode: service:vpn # run on the vpn network
     environment:
-      - PUID=99 
-      - PGID=100 
-      - TZ=Europe/London 
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /mnt/user/Downloads:/downloads # downloads folder
-      - /mnt/user/appdata/autoDownloaders/config/deluge:/config # config files
+      - ${APPDATA_DELUGE}:/config # config files
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/deluge-logo.png"
-      - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:8112"
+      - "net.unraid.docker.webui=https://$HOSTNAME:8112"
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:develop
-    container_name: prowlarr
+    container_name: htpc-prowlarr
     network_mode: service:vpn # run on the vpn network
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /mnt/user/appdata/autoDownloaders/config/prowlarr/:/config
-    restart: unless-stopped
+      - ${APPDATA_PROWLARR}:/config
+    restart: ${RESTART_POLICY}
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/prowlarr-icon.png"
-      - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:9696"
+      - "net.unraid.docker.webui=https://$HOSTNAME:9696"
 
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd
-    container_name: sabnzbd
+    container_name: htpc-sabnzbd
     network_mode: service:vpn # run on the vpn network
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /mnt/user/appdata/autoDownloaders/config/sabnzbd:/config
-      - /mnt/user/Downloads:/downloads #optional
-    restart: unless-stopped
+      - ${APPDATA_SABNZBD}:/config
+      - ${DOWNLOADS_SABNZBD}:/downloads #optional
+    restart: ${RESTART_POLICY}
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/sabnzbd-icon.png"
-      - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:8080"
+      - "net.unraid.docker.webui=https://$HOSTNAME:8080"
 
   sonarr:
-    container_name: sonarr
+    container_name: htpc-sonarr
     image: linuxserver/sonarr:latest
-    restart: unless-stopped
+    restart: ${RESTART_POLICY}
     network_mode: service:vpn # run on the vpn network
     environment:
-      - PUID=99 
-      - PGID=100 
-      - TZ=Europe/London 
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /mnt/user/appdata/autoDownloaders/config/sonarr:/config # config files
-      - /mnt/user/TV:/tv # tv shows folder
-      - /mnt/user/Downloads:/downloads # download folder
-      - /mnt/user/OtherAnime:/nonMainAnime # non mainstream anime folder
-      - /mnt/user/Anime:/anime # anime folder
+      - ${APPDATA_SONARR}:/config # config files
+      - ${MEDIA_TV}:/tv # tv shows
+      - ${MEDIA_ANIME}:/anime # anime shows
+      - ${DOWNLOADS}:/downloads
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/sonarr-icon.png"
-      - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:8989"
+      - "net.unraid.docker.webui=https://$HOSTNAME:8989"
 
   radarr:
-    container_name: radarr
+    container_name: htpc-radarr
     image: linuxserver/radarr:latest
-    restart: unless-stopped
+    restart: ${RESTART_POLICY}
     network_mode: service:vpn # run on the vpn network
     environment:
-      - PUID=99 
-      - PGID=100 
-      - TZ=Europe/London 
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /mnt/user/appdata/autoDownloaders/config/radarr:/config # config files
-      - /mnt/user/Movies:/movies # movies folder
-      - /mnt/user/Downloads:/downloads # download folder
-      - /mnt/user/AnimeMovies:/animeMovies # anime movie folder
+      - ${APPDATA_RADARR}:/config # config files
+      - ${MEDIA_MOVIES}:/movies # movies folder
+      - ${DOWNLOADS}:/downloads
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/radarr-icon.png"
-      - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:7878"
+      - "net.unraid.docker.webui=https://$HOSTNAME:7878"
 
   bazarr:
-    container_name: bazarr
+    container_name: htpc-bazarr
     image: linuxserver/bazarr
-    restart: unless-stopped
+    restart: ${RESTART_POLICY}
     network_mode: service:vpn # run on the vpn network
     environment:
-      - PUID=99 
-      - PGID=100 
-      - TZ=Europe/London 
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
       - UMASK_SET=022 #optional
     volumes:
-      - /mnt/user/appdata/autoDownloaders/config/bazarr:/config # config files
-      - /mnt/user/Movies:/movies # movies folder
-      - /mnt/user/TV:/tv # tv shows folder
-      - /mnt/user/OtherAnime:/nonMainAnime # non mainstream anime folder
-      - /mnt/user/Anime:/anime # anime folder
-      - /mnt/user/AnimeMovies:/animeMovies # anime movie folder
+      - ${APPDATA_BAZARR}:/config # config files
+      - ${MEDIA_DIR}:/media # media folder
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/bazarr-logo.png"
-      - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:6767"
+      - "net.unraid.docker.webui=https://$HOSTNAME:6767"

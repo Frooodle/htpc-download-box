@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<Container version="2">
-  <Name>radarr</Name>
-  <Repository>linuxserver/radarr</Repository>
-  <WebUI>http://192.168.1.53:7878/</WebUI>
-  <Icon>https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/radarr-icon.png</Icon>
-</Container>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="Container">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Name" type="xs:string" />
+				<xs:element name="Repository" type="xs:string" />
+				<xs:element name="WebUI" type="xs:string" minOccurs="0" />
+				<xs:element name="Icon" type="xs:string" />
+			</xs:all>
+			<xs:attribute name="version" type="xs:integer" use="required" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

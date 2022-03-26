@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<Container version="2">
-  <Name>deluge</Name>
-  <Repository>linuxserver/deluge</Repository>
-  <WebUI>http://192.168.1.53:8112/</WebUI>
-  <Icon>https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/deluge-logo.png</Icon>
-</Container>

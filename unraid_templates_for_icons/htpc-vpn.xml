@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<?xml-model href="htpc_template_schema.xsd"?>
+
+
+<Container version="2">
+	<Name>htpc-vpn</Name>
+	<Repository>dperson/openvpn-client</Repository>
+	<Icon>https://raw.githubusercontent.com/ich777/docker-templates/master/ich777/images/openvpn-client.png</Icon>
+</Container>

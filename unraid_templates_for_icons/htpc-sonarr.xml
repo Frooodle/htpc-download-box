@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<?xml-model href="htpc_template_schema.xsd"?>
+
+
+<Container version="2">
+	<Name>htpc-sonarr</Name>
+	<Repository>linuxserver/sonarr</Repository>
+	<WebUI>http://[IP]:[PORT:8989]/</WebUI>
+	<Icon>https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/sonarr-icon.png</Icon>
+</Container>
