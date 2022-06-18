@@ -5,7 +5,7 @@ services:
     image: dperson/openvpn-client:latest
     cap_add:
       - net_admin # required to modify network interfaces
-    restart: unless-stopped
+    restart: on-failure:5 
     volumes:
       - /dev/net:/dev/net:z # tun device
       - /mnt/user/appdata/autoDownloaders/config/vpn:/vpn # OpenVPN configuration
@@ -17,15 +17,18 @@ services:
       - 8989:8989 # port for sonarr web UI to be reachable from local network
       - 7878:7878 # port for radarr web UI to be reachable from local network
       - 6767:6767 # port for bazarr web UI to be reachable from local network	  
-      - 8080:8080 # port for sabnzbd web UI to be reachable from local network	   
+      - 8080:8080 # port for sabnzbd web UI to be reachable from local network	  
+      - 8787:8787 # port for readarr web UI to be reachable from local network
     command: '-f "" -r 192.168.1.0/24' # enable firewall and route local network traffic
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/ich777/docker-templates/master/ich777/images/openvpn-client.png"
+      - "net.unraid.docker.webui=https://$DOCKERHOSTNAME"
+      - "com.centurylinklabs.watchtower.enable=true"
  
   deluge:
     container_name: deluge
     image: linuxserver/deluge:latest
-    restart: unless-stopped
+    restart: on-failure:5
     network_mode: service:vpn # run on the vpn network
     environment:
       - PUID=99 
@@ -37,7 +40,26 @@ services:
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/deluge-logo.png"
       - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:8112"
+      - "com.centurylinklabs.watchtower.enable=true"
 
+  readarr:
+    container_name: readarr
+    image: lscr.io/linuxserver/readarr:develop
+    restart: on-failure:5
+    network_mode: service:vpn # run on the vpn network
+    environment:
+      - PUID=99 
+      - PGID=100 
+      - TZ=Europe/London 
+    volumes:
+      - /mnt/user/appdata/autoDownloaders/config/readarr/:/config
+      - /mnt/user/AudioBooks:/books #optional
+      - /mnt/user/Downloads:/downloads #optional
+    labels: #to support unraid 9.10 on release
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/Readarr/Readarr/develop/Logo/256.png"
+      - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:8787"
+      - "com.centurylinklabs.watchtower.enable=true"
+      
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:develop
     container_name: prowlarr
@@ -48,11 +70,12 @@ services:
       - TZ=Europe/London
     volumes:
       - /mnt/user/appdata/autoDownloaders/config/prowlarr/:/config
-    restart: unless-stopped
+    restart: on-failure:5
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/prowlarr-icon.png"
       - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:9696"
-
+      - "com.centurylinklabs.watchtower.enable=true"
+      
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd
     container_name: sabnzbd
@@ -64,15 +87,16 @@ services:
     volumes:
       - /mnt/user/appdata/autoDownloaders/config/sabnzbd:/config
       - /mnt/user/Downloads:/downloads #optional
-    restart: unless-stopped
+    restart: on-failure:5
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/sabnzbd-icon.png"
       - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:8080"
-
+      - "com.centurylinklabs.watchtower.enable=true"
+      
   sonarr:
     container_name: sonarr
     image: linuxserver/sonarr:latest
-    restart: unless-stopped
+    restart: on-failure:5
     network_mode: service:vpn # run on the vpn network
     environment:
       - PUID=99 
@@ -88,11 +112,12 @@ services:
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/sonarr-icon.png"
       - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:8989"
-
+      - "com.centurylinklabs.watchtower.enable=true"
+      
   radarr:
     container_name: radarr
     image: linuxserver/radarr:latest
-    restart: unless-stopped
+    restart: on-failure:5
     network_mode: service:vpn # run on the vpn network
     environment:
       - PUID=99 
@@ -107,11 +132,12 @@ services:
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/radarr-icon.png"
       - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:7878"
-
+      - "com.centurylinklabs.watchtower.enable=true"
+      
   bazarr:
     container_name: bazarr
     image: linuxserver/bazarr
-    restart: unless-stopped
+    restart: on-failure:5
     network_mode: service:vpn # run on the vpn network
     environment:
       - PUID=99 
@@ -128,3 +154,4 @@ services:
     labels: #to support unraid 9.10 on release
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/bazarr-logo.png"
       - "net.unraid.docker.webui=https://$DOCKERHOSTNAME:6767"
+      - "com.centurylinklabs.watchtower.enable=true"
